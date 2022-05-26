@@ -21,8 +21,8 @@ namespace Yakumo890.VRC.PhysicsBone
 
         private bool m_canReplaceTransform = true;
 
+        private bool m_willExtractPhysBone = true;
         private bool m_willExtractColliders = false;
-        private bool m_willExtractPhysBone = false;
 
         // コンテンツにインデントを付けるときのインデント幅(px)
         private const int IndentWidth = 25;
@@ -48,11 +48,6 @@ namespace Yakumo890.VRC.PhysicsBone
             m_avatarObject = EditorGUILayout.ObjectField("対象のアバター", m_avatarObject, typeof(GameObject), true) as GameObject;
             if (EditorGUI.EndChangeCheck())
             {
-                if (m_avatarObject == null)
-                {
-                    return;
-                }
-
                 if (m_engine == null)
                 {
                     m_engine = new PhysicsBoneExtractorEngine(m_avatarObject);
@@ -61,6 +56,11 @@ namespace Yakumo890.VRC.PhysicsBone
                 {
                     m_engine.AvatarObject = m_avatarObject;
                 }
+            }
+
+            if (m_avatarObject == null)
+            {
+                return;
             }
 
             if (!AvatarUtility.IsAvatar(m_avatarObject))

@@ -10,16 +10,10 @@ namespace Yakumo890.VRC.PhysicsBone
 {
     public class PhysicsBoneExtractor : EditorWindow
     {
-        private PhysicsBoneExtractorEngine m_engine;
+        private static PhysicsBoneExtractorEngine m_engine = new PhysicsBoneExtractorEngine();
 
-        private GameObject m_avatarObject = null;
         private GameObject m_physBoneObject = null;
         private GameObject m_collidersRoot = null;
-
-        private bool m_isIgnoreInactive = false;
-        private bool m_isIgnoreEditorOnly = false;
-
-        private bool m_canReplaceTransform = true;
 
         private bool m_willExtractPhysBone = true;
         private bool m_willExtractColliders = false;
@@ -44,26 +38,14 @@ namespace Yakumo890.VRC.PhysicsBone
             GUILayout.Label("PhysicsBoneを一箇所にまとめるツール", EditorStyles.boldLabel);
             GUILayout.Space(20);
 
-            EditorGUI.BeginChangeCheck();
-            m_avatarObject = EditorGUILayout.ObjectField("対象のアバター", m_avatarObject, typeof(GameObject), true) as GameObject;
-            if (EditorGUI.EndChangeCheck())
-            {
-                if (m_engine == null)
-                {
-                    m_engine = new PhysicsBoneExtractorEngine(m_avatarObject);
-                }
-                else
-                {
-                    m_engine.AvatarObject = m_avatarObject;
-                }
-            }
+            m_engine.AvatarObject = EditorGUILayout.ObjectField("対象のアバター", m_engine.AvatarObject, typeof(GameObject), true) as GameObject;
 
-            if (m_avatarObject == null)
+            if (m_engine.hasNullAvatar())
             {
                 return;
             }
 
-            if (!AvatarUtility.IsAvatar(m_avatarObject))
+            if (!m_engine.AvatarObjectIsAvatar())
             {
                 EditorGUILayout.HelpBox("アバターでありません。Animatorコンポーネントが付いているか確認してください。", MessageType.Error, true);
                 return;
@@ -75,19 +57,8 @@ namespace Yakumo890.VRC.PhysicsBone
             GUILayout.BeginHorizontal();
             GUILayout.Space(IndentWidth);
             GUILayout.BeginVertical();
-            EditorGUI.BeginChangeCheck();
-            m_isIgnoreInactive = GUILayout.Toggle(m_isIgnoreInactive, "非アクティブオブジェクトを無視");
-            if (EditorGUI.EndChangeCheck())
-            {
-                m_engine.IgnoreInactive = m_isIgnoreInactive;
-            }
-
-            EditorGUI.BeginChangeCheck();
-            m_isIgnoreEditorOnly = GUILayout.Toggle(m_isIgnoreEditorOnly, "EditorOnlyタグが付いたオブジェクトを無視");
-            if (EditorGUI.EndChangeCheck())
-            {
-                m_engine.IgnoreEditorOnly = m_isIgnoreEditorOnly;
-            }
+            m_engine.IgnoreInactive = GUILayout.Toggle(m_engine.IgnoreInactive, "非アクティブオブジェクトを無視");
+            m_engine.IgnoreEditorOnly = GUILayout.Toggle(m_engine.IgnoreEditorOnly, "EditorOnlyタグが付いたオブジェクトを無視");
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
 
@@ -98,15 +69,10 @@ namespace Yakumo890.VRC.PhysicsBone
             GUILayout.BeginHorizontal();
             GUILayout.Space(IndentWidth);
             GUILayout.BeginVertical();
-            EditorGUI.BeginChangeCheck();
-            m_canReplaceTransform = GUILayout.Toggle(
-                m_canReplaceTransform,
+            m_engine.CanReplaceRootTransform = GUILayout.Toggle(
+                m_engine.CanReplaceRootTransform,
                 new GUIContent("Root Transformの変更を許可",
                 "Root TransoformがNoneの場合、PhysBone(Collider)がついていたオブジェクトをRoot Transformにセットする"));
-            if (EditorGUI.EndChangeCheck())
-            {
-                m_engine.CanReplaceRootTransform = m_canReplaceTransform;
-            }
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
 
@@ -208,6 +174,11 @@ namespace Yakumo890.VRC.PhysicsBone
         private bool m_canReplaceRootTransform;
 
 
+        public PhysicsBoneExtractorEngine() : this(null, false, false, true)
+        {
+        }
+
+
         public PhysicsBoneExtractorEngine(GameObject avatarObject) : this(avatarObject, false, false, true)
         {
         }
@@ -275,6 +246,18 @@ namespace Yakumo890.VRC.PhysicsBone
             {
                 m_canReplaceRootTransform = value;
             }
+        }
+
+
+        public bool hasNullAvatar()
+        {
+            return AvatarObject == null;
+        }
+
+
+        public bool AvatarObjectIsAvatar()
+        {
+            return AvatarObject != null && AvatarUtility.IsAvatar(AvatarObject);
         }
 
 

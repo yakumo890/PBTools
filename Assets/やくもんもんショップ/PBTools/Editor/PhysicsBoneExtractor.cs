@@ -123,7 +123,7 @@ namespace Yakumo890.VRC.PhysicsBone
             {
                 m_physBoneObject = EditorGUILayout.ObjectField(
                     new GUIContent("対象のオブジェクト",
-                    "このオブジェクトにすべてのPhyisBoneを付けます。\n指定しなければ\"PB\"というオブジェクトを自動生成します。"),
+                    "このオブジェクトにすべてのPhyisBoneを付ける。\n指定しなければ\"PB\"というオブジェクトを自動生成する"),
                     m_physBoneObject, typeof(GameObject), true) as GameObject;
             }
             GUILayout.EndVertical();
@@ -142,11 +142,11 @@ namespace Yakumo890.VRC.PhysicsBone
             {
                 m_collidersRoot = EditorGUILayout.ObjectField(
                     new GUIContent("ルートオブジェクト",
-                    "複数生成されるコライダーオブジェクトをまとめるためのルートオブジェクトです。\nオブジェクトを指定しなければ\"PBC\"というオブジェクトを自動生成します。"),
+                    "複数生成されるコライダーオブジェクトをまとめるためのルートオブジェクト。\nオブジェクトを指定しなければ\"PBC\"というオブジェクトを自動生成する。"),
                     m_collidersRoot,
                     typeof(GameObject), true) as GameObject;
                 m_colliderPrefix = EditorGUILayout.TextField(
-                    new GUIContent("プレフィックス", "コライダーオブジェクトの名前の先頭につける識別子です。\n{プレフィックス}_{元のコライダーオブジェクトの名前}といった命名になります。"),
+                    new GUIContent("プレフィックス", "コライダーオブジェクトの名前の先頭につける識別子。\n{プレフィックス}_{元のコライダーオブジェクトの名前}といった命名になる。"),
                     m_colliderPrefix);
             }
             GUILayout.EndVertical();

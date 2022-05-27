@@ -155,30 +155,44 @@ namespace Yakumo890.VRC.PhysicsBone
 
             if (GUILayout.Button("まとめる"))
             {
-                if (m_engine != null)
+                if (m_engine == null)
                 {
-                    if (m_willExtractPhysBone)
+                    return;
+                }
+
+                bool extractedBones = false;
+                bool extractedColliders = false;
+                if (m_willExtractPhysBone)
+                {
+                    if (m_physBoneObject)
                     {
-                        if (m_physBoneObject)
-                        {
-                            m_engine.ExtractPhysBones(m_physBoneObject);
-                        }
-                        else
-                        {
-                            m_engine.ExtractPhysBones(PBPhysBoneObjectName);
-                        }
+                        extractedBones = m_engine.ExtractPhysBones(m_physBoneObject);
                     }
-                    if (m_willExtractColliders)
+                    else
                     {
-                        if (m_collidersRoot)
-                        {
-                            m_engine.ExtractColliders(m_collidersRoot, m_colliderPrefix);
-                        }
-                        else
-                        {
-                            m_engine.ExtractColliders(ColliderRootObjectName, m_colliderPrefix);
-                        }
+                        extractedBones = m_engine.ExtractPhysBones(PBPhysBoneObjectName);
                     }
+                }
+
+                if (m_willExtractColliders)
+                {
+                    if (m_collidersRoot)
+                    {
+                        extractedColliders = m_engine.ExtractColliders(m_collidersRoot, m_colliderPrefix);
+                    }
+                    else
+                    {
+                        extractedColliders = m_engine.ExtractColliders(ColliderRootObjectName, m_colliderPrefix);
+                    }
+                }
+
+                if (extractedBones && extractedColliders)
+                {
+                    Debug.Log("[PhysicsBoneExtractor] まとめ成功");
+                }
+                else
+                {
+                    Debug.LogError("[PhysicsBoneExtractor] まとめ失敗");
                 }
             }
         }
@@ -264,16 +278,16 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
-        public void ExtractColliders(GameObject target, string colliderObjectPrefix)
+        public bool ExtractColliders(GameObject target, string colliderObjectPrefix)
         {
             if (m_avatarObject == null)
             {
-                return;
+                return false;
             }
 
             if (colliderObjectPrefix == null)
             {
-                return;
+                return false;
             }
 
             var colliders = m_avatarObject.GetComponentsInChildren<VRCPhysBoneCollider>(!m_ignoreInactive);
@@ -349,25 +363,30 @@ namespace Yakumo890.VRC.PhysicsBone
 
                 ComponentUtility.MoveComponent(collider, pbc);
             }
+
+            return true;
         }
 
-        public void ExtractColliders(string pbColliderRootObjectName, string colliderObjectPrefix)
+
+        public bool ExtractColliders(string pbColliderRootObjectName, string colliderObjectPrefix)
         {
             if (pbColliderRootObjectName == null)
             {
-                return;
+                return false;
             }
 
             var target = AvatarUtility.CreateAvatarObject(m_avatarObject, pbColliderRootObjectName, false);
             ExtractColliders(target, colliderObjectPrefix);
+
+            return true;
         }
 
 
-        public void ExtractPhysBones(GameObject targetObject)
+        public bool ExtractPhysBones(GameObject targetObject)
         {
             if (m_avatarObject == null)
             {
-                return;
+                return false;
             }
 
             var components = m_avatarObject.GetComponentsInChildren<VRCPhysBone>(!m_ignoreInactive);
@@ -388,18 +407,22 @@ namespace Yakumo890.VRC.PhysicsBone
 
                 ComponentUtility.MoveComponent(pb, targetObject);
             }
+
+            return true;
         }
 
 
-        public void ExtractPhysBones(string pbObjectName)
+        public bool ExtractPhysBones(string pbObjectName)
         {
             if (pbObjectName == null)
             {
-                return;
+                return false;
             }
 
             var target = AvatarUtility.CreateAvatarObject(m_avatarObject, pbObjectName, false);
             ExtractPhysBones(target);
+
+            return true;
         }
 
 

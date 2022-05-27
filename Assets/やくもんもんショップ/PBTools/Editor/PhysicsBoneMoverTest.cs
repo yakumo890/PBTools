@@ -25,8 +25,6 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             m_engine.SrcAvatarObject = srcAvatar.gameObject;
             m_engine.DestAvatarObject = destAvatar.gameObject;
 
-            m_engine.CanDeleteSourcePBs = false;
-
             // 移動先にないオブジェクトを作っておく
             srcAvatar.CreateObject<VRCPhysBone>("Dummy");
 
@@ -145,11 +143,13 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             m_engine.SrcAvatarObject = srcAvatar.gameObject;
             m_engine.DestAvatarObject = destAvatar.gameObject;
 
-            m_engine.CanDeleteSourcePBs = canDeleteSourcePBs;
-
             var nBeforePBs = srcAvatar.gameObject.GetComponentsInChildren<VRCPhysBone>().Length;
 
             m_engine.MovePhysBones();
+            if (canDeleteSourcePBs)
+            {
+                m_engine.RemoveCopiedComponent();
+            }
 
             var nAfterPBs = srcAvatar.gameObject.GetComponentsInChildren<VRCPhysBone>().Length;
             if (canDeleteSourcePBs)
@@ -221,8 +221,6 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             var destAvatar = new AvatarForTest("DestAvatar", false);
             m_engine.SrcAvatarObject = srcAvatar.gameObject;
             m_engine.DestAvatarObject = destAvatar.gameObject;
-
-            m_engine.CanDeleteSourcePBs = false;
 
             // 移動先にないオブジェクトを作っておく
             srcAvatar.CreateObject<VRCPhysBoneCollider>("Dummy");
@@ -304,11 +302,13 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             m_engine.SrcAvatarObject = srcAvatar.gameObject;
             m_engine.DestAvatarObject = destAvatar.gameObject;
 
-            m_engine.CanDeleteSourcePBs = canDeleteSourcePBs;
-
             var nBeforePBs = srcAvatar.gameObject.GetComponentsInChildren<VRCPhysBoneCollider>().Length;
 
             m_engine.MovePhysBoneColliders();
+            if (canDeleteSourcePBs)
+            {
+                m_engine.RemoveCopiedComponent();
+            }
 
             var nAfterPBs = srcAvatar.gameObject.GetComponentsInChildren<VRCPhysBoneCollider>().Length;
             if (canDeleteSourcePBs)

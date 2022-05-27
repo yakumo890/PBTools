@@ -57,26 +57,28 @@ namespace Yakumo890.VRC.PhysicsBone
 
             GUILayout.Space(20);
 
-            m_engine.IgnoreHasNoRootTransform = EditorGUILayout.Toggle(
+            m_engine.IgnoreHasNoRootTransform = GUILayout.Toggle(
+                m_engine.IgnoreHasNoRootTransform,
                 new GUIContent(
                     "移動先にRoot Transformがないなら無視する",
-                    "PB(Collider)のRoot Transformと同じ名前のオブジェクトが移動先にないならPB(Collider)の移動をしない"),
-                m_engine.IgnoreHasNoRootTransform);
+                    "PB(Collider)のRoot Transformと同じ名前のオブジェクトが移動先にないならPB(Collider)の移動をしない"));
 
-            m_engine.IgnoreHasNoColliders = EditorGUILayout.Toggle(
+            m_engine.IgnoreHasNoColliders = GUILayout.Toggle(
+                m_engine.IgnoreHasNoColliders,
                 new GUIContent(
                     "移動先にColliderがないなら無視する",
-                    "PBについているColliderのどれか1つでも同じ名前のオブジェクトが移動先にないならPBの移動をしない"),
-                m_engine.IgnoreHasNoColliders);
+                    "PBについているColliderのどれか1つでも同じ名前のオブジェクトが移動先にないならPBの移動をしない"));
 
-            m_engine.IgnoreHasNoMatchPathObject = EditorGUILayout.Toggle(
+            m_engine.IgnoreHasNoMatchPathObject = GUILayout.Toggle(
+                m_engine.IgnoreHasNoMatchPathObject,
                 new GUIContent(
                     "パスが一致しなければ無視する",
-                    "移動先に同じ名前のオブジェクトがあったとしても、ルートオブジェクトからのパス(階層)が合っていないなら無視する"
-                ),
-                m_engine.IgnoreHasNoMatchPathObject);
+                    "移動先に同じ名前のオブジェクトがあったとしても、ルートオブジェクトからのパス(階層)が合っていないなら無視する"));
 
-            m_canDeleteSourcePBs = EditorGUILayout.Toggle("移動後に元のPB(Collider)を削除する", m_canDeleteSourcePBs);
+            m_canDeleteSourcePBs = GUILayout.Toggle(m_canDeleteSourcePBs, 
+                new GUIContent(
+                    "移動後に元のPB(Collider)を削除する",
+                    "移動したコライダーを元のアバターから削除する。移動していないものは削除しない"));
 
             if (GUILayout.Button("移動"))
             {

@@ -29,7 +29,12 @@ namespace Yakumo890.VRC.PhysicsBone
 
             m_engine.SrcAvatarObject = EditorGUILayout.ObjectField("移動元のアバター", m_engine.SrcAvatarObject, typeof(GameObject), true) as GameObject;
 
-            if (m_engine.CheckSrcIsAvatar())
+            if (m_engine.SrcAvatarObject  == null)
+            {
+                return;
+            }
+
+            if (!m_engine.CheckSrcIsAvatar())
             {
                 EditorGUILayout.HelpBox("アバターでありません。Animatorコンポーネントが付いているか確認してください。", MessageType.Error, true);
                 return;
@@ -37,14 +42,14 @@ namespace Yakumo890.VRC.PhysicsBone
 
             m_engine.DestAvatarObject = EditorGUILayout.ObjectField("移動先のアバター", m_engine.DestAvatarObject, typeof(GameObject), true) as GameObject;
 
-            if (m_engine.CheckDestIsAvatar())
+            if (m_engine.HasNullAvatar())
             {
-                EditorGUILayout.HelpBox("アバターでありません。Animatorコンポーネントが付いているか確認してください。", MessageType.Error, true);
                 return;
             }
 
-            if (m_engine.HasNullAvatar())
+            if (!m_engine.CheckDestIsAvatar())
             {
+                EditorGUILayout.HelpBox("アバターでありません。Animatorコンポーネントが付いているか確認してください。", MessageType.Error, true);
                 return;
             }
 
@@ -272,7 +277,10 @@ namespace Yakumo890.VRC.PhysicsBone
                 }
             }
 
-            Object.DestroyImmediate(tmp);
+            if (tmp != null)
+            {
+                Object.DestroyImmediate(tmp);
+            }
         }
 
 
@@ -361,7 +369,10 @@ namespace Yakumo890.VRC.PhysicsBone
                 }
             }
 
-            Object.DestroyImmediate(tmp);
+            if (tmp != null)
+            {
+                Object.DestroyImmediate(tmp);
+            }
         }
 
 

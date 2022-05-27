@@ -43,6 +43,8 @@ namespace Yakumo890.VRC.PhysicsBone
             if (GUILayout.Button("一括でOFFにする"))
             {
                 m_engine.TurnOffAll();
+
+                Debug.Log("すべてのIsAnimatedをOFFに変更");
             }
 
             m_showDetails = EditorGUILayout.Foldout(m_showDetails, "詳細設定");

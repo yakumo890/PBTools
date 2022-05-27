@@ -31,7 +31,7 @@ namespace Yakumo890.VRC.PhysicsBone
 
             m_engine.SrcAvatarObject = EditorGUILayout.ObjectField("移動元のアバター", m_engine.SrcAvatarObject, typeof(GameObject), true) as GameObject;
 
-            if (m_engine.SrcAvatarObject  == null)
+            if (m_engine.SrcAvatarObject == null)
             {
                 return;
             }
@@ -80,12 +80,21 @@ namespace Yakumo890.VRC.PhysicsBone
 
             if (GUILayout.Button("移動"))
             {
-                m_engine.MovePhysBoneColliders();
-                m_engine.MovePhysBones();
+                var resultMoveColliders = m_engine.MovePhysBoneColliders();
+                var resultMoveBones = m_engine.MovePhysBones();
 
                 if (m_canDeleteSourcePBs)
                 {
                     m_engine.RemoveCopiedComponent();
+                }
+
+                if (resultMoveBones && resultMoveColliders)
+                {
+                    Debug.Log("[PhysicsBoneMover] 移動完了");
+                }
+                else
+                {
+                    Debug.LogError("[PhysicsBoneMover] 移動失敗");
                 }
             }
         }
@@ -93,7 +102,7 @@ namespace Yakumo890.VRC.PhysicsBone
 
         private static void OnChanged()
         {
-            m_engine.ReloadSourceComponents();
+            m_engine.ReloadSourceComponents();            
         }
     }
 
@@ -215,11 +224,11 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
-        public void MovePhysBoneColliders()
+        public bool MovePhysBoneColliders()
         {
             if (HasNullAvatar())
             {
-                return;
+                return false;
             }
 
 
@@ -277,14 +286,16 @@ namespace Yakumo890.VRC.PhysicsBone
             {
                 Object.DestroyImmediate(tmp);
             }
+
+            return true;
         }
 
 
-        public void MovePhysBones()
+        public bool MovePhysBones()
         {
             if (HasNullAvatar())
             {
-                return;
+                return false;
             }
 
 
@@ -321,15 +332,7 @@ namespace Yakumo890.VRC.PhysicsBone
                 foreach (var col in pb.colliders)
                 {
                     Transform colliderObjectTransform = null;
-                    // colliderはすでに移動して消えている可能性があるので、nullならば移動先から探す
-                    if (col == null)
-                    {
-
-                    }
-                    else
-                    {
-                        colliderObjectTransform = GetSameNameObjectFromDest(col.gameObject);
-                    }
+                    colliderObjectTransform = GetSameNameObjectFromDest(col.gameObject);
 
                     if (m_ignoreHasNoColliders && colliderObjectTransform == null)
                     {
@@ -376,6 +379,8 @@ namespace Yakumo890.VRC.PhysicsBone
             {
                 Object.DestroyImmediate(tmp);
             }
+
+            return true;
         }
 
 

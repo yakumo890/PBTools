@@ -5,7 +5,7 @@ using VRC.SDK3.Dynamics.PhysBone.Components;
 
 namespace Yakumo890.VRC.PhysicsBone.Test
 {
-    public class PhysicsBoneIsAnimatedChangerTest : MonoBehaviour
+    public class PhysicsBoneIsAnimatedChangerTest
     {
         private PhysicsBoneIsAnimatedChangerEngine m_engine;
 
@@ -42,7 +42,7 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             m_physBones[1] = m_childObject.AddComponent<VRCPhysBone>();
             m_physBones[1].rootTransform = m_rootTransformObject.transform;
 
-            m_engine.GetPhysicsBones(m_rootObject);
+            m_engine.AvatarObject = m_rootObject;
         }
 
 

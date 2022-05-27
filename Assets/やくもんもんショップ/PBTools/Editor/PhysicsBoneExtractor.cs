@@ -76,14 +76,14 @@ namespace Yakumo890.VRC.PhysicsBone
             GUILayout.Space(IndentWidth);
             GUILayout.BeginVertical();
             EditorGUI.BeginChangeCheck();
-            m_isIgnoreInactive = EditorGUILayout.Toggle("非アクティブを無視", m_isIgnoreInactive);
+            m_isIgnoreInactive = GUILayout.Toggle(m_isIgnoreInactive, "非アクティブオブジェクトを無視");
             if (EditorGUI.EndChangeCheck())
             {
                 m_engine.IgnoreInactive = m_isIgnoreInactive;
             }
 
             EditorGUI.BeginChangeCheck();
-            m_isIgnoreEditorOnly = EditorGUILayout.Toggle("EditorOnlyタグを無視", m_isIgnoreEditorOnly);
+            m_isIgnoreEditorOnly = GUILayout.Toggle(m_isIgnoreEditorOnly, "EditorOnlyタグが付いたオブジェクトを無視");
             if (EditorGUI.EndChangeCheck())
             {
                 m_engine.IgnoreEditorOnly = m_isIgnoreEditorOnly;
@@ -99,10 +99,10 @@ namespace Yakumo890.VRC.PhysicsBone
             GUILayout.Space(IndentWidth);
             GUILayout.BeginVertical();
             EditorGUI.BeginChangeCheck();
-            m_canReplaceTransform = EditorGUILayout.Toggle(
+            m_canReplaceTransform = GUILayout.Toggle(
+                m_canReplaceTransform,
                 new GUIContent("Root Transformの変更を許可",
-                "Root TransoformがNoneの場合、PhysBone(Collider)がついていたオブジェクトをRoot Transformにセットします。"),
-                m_canReplaceTransform);
+                "Root TransoformがNoneの場合、PhysBone(Collider)がついていたオブジェクトをRoot Transformにセットする"));
             if (EditorGUI.EndChangeCheck())
             {
                 m_engine.CanReplaceRootTransform = m_canReplaceTransform;
@@ -118,7 +118,7 @@ namespace Yakumo890.VRC.PhysicsBone
             GUILayout.Space(IndentWidth);
 
             GUILayout.BeginVertical();
-            m_willExtractPhysBone = EditorGUILayout.Toggle("PhysicsBoneをまとめる", m_willExtractPhysBone);
+            m_willExtractPhysBone = GUILayout.Toggle(m_willExtractPhysBone, "PhysicsBoneをまとめる");
             if (m_willExtractPhysBone)
             {
                 m_physBoneObject = EditorGUILayout.ObjectField(
@@ -137,7 +137,7 @@ namespace Yakumo890.VRC.PhysicsBone
             GUILayout.Space(IndentWidth);
 
             GUILayout.BeginVertical();
-            m_willExtractColliders = EditorGUILayout.Toggle("コライダーもまとめる", m_willExtractColliders);
+            m_willExtractColliders = GUILayout.Toggle(m_willExtractColliders, "コライダーもまとめる");
             if (m_willExtractColliders)
             {
                 m_collidersRoot = EditorGUILayout.ObjectField(

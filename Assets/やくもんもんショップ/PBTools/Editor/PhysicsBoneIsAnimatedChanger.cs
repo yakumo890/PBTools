@@ -8,13 +8,11 @@ namespace Yakumo890.VRC.PhysicsBone
 {
     public class PhyisicsBoneIsAnimatedChanger : EditorWindow
     {
-        private GameObject m_avatarObject = null;
+        private static PhysicsBoneIsAnimatedChangerEngine m_engine = new PhysicsBoneIsAnimatedChangerEngine();
 
         private bool m_showDetails = false;
 
         private Vector2 m_scrollPosition = Vector2.zero;
-
-        private PhysicsBoneIsAnimatedChangerEngine m_engine;
 
         [MenuItem("Yakumo890/PBTools/PhyisicsBoneIsAnimatedChanger")]
         static void ShowWindow()
@@ -23,29 +21,19 @@ namespace Yakumo890.VRC.PhysicsBone
             window.titleContent = new GUIContent("Phyiscs Bone IsAnimated Changer");
         }
 
-        private void CreateGUI()
-        {
-            m_engine = new PhysicsBoneIsAnimatedChangerEngine();
-        }
-
         private void OnGUI()
         {
             GUILayout.Label("PhysicsBoneのIsAnimatedを一括でOFFにするツール", EditorStyles.boldLabel);
             GUILayout.Space(20);
 
-            EditorGUI.BeginChangeCheck();
-            m_avatarObject = EditorGUILayout.ObjectField("対象のアバター", m_avatarObject, typeof(GameObject), true) as GameObject;
-            if (EditorGUI.EndChangeCheck())
-            {
-                m_engine.GetPhysicsBones(m_avatarObject);
-            }
+            m_engine.AvatarObject = EditorGUILayout.ObjectField("対象のアバター", m_engine.AvatarObject, typeof(GameObject), true) as GameObject;
 
-            if (m_avatarObject == null)
+            if (m_engine.hasNullAvatar())
             {
                 return;
             }
 
-            if (!AvatarUtility.IsAvatar(m_avatarObject))
+            if (!m_engine.AvatarObjectIsAvatar())
             {
                 EditorGUILayout.HelpBox("アバターでありません。Animatorコンポーネントが付いているか確認してください。", MessageType.Error, true);
                 return;
@@ -97,15 +85,26 @@ namespace Yakumo890.VRC.PhysicsBone
     {
         delegate void PhysicsBoneHandler(VRCPhysBone physBone);
 
-        public VRCPhysBone[] m_physBones = null;
-        public string[] m_objectNames = null;
-        public string[] m_rootTransformNames = null;
+        private GameObject m_avatarObject = null;
 
-        public void GetPhysicsBones(GameObject avatarObject)
+        private VRCPhysBone[] m_physBones = null;
+        private string[] m_objectNames = null;
+        private string[] m_rootTransformNames = null;
+
+        public GameObject AvatarObject
         {
-            m_physBones = avatarObject.GetComponentsInChildren<VRCPhysBone>(true);
-            CreateObjectNames();
-            CreateRootTransformNames();
+            get
+            {
+                return m_avatarObject;
+            }
+            set
+            {
+                m_avatarObject = value;
+                if (m_avatarObject != null)
+                {
+                    LoadPhysicsBones();
+                }
+            }
         }
 
         public int Count
@@ -144,6 +143,19 @@ namespace Yakumo890.VRC.PhysicsBone
             }
         }
 
+
+        public bool hasNullAvatar()
+        {
+            return AvatarObject == null;
+        }
+
+
+        public bool AvatarObjectIsAvatar()
+        {
+            return AvatarObject != null && AvatarUtility.IsAvatar(AvatarObject);
+        }
+
+
         public void TurnOffAll()
         {
             foreach (var pb in m_physBones)
@@ -151,6 +163,15 @@ namespace Yakumo890.VRC.PhysicsBone
                 pb.isAnimated = false;
             }
         }
+
+
+        public void LoadPhysicsBones()
+        {
+            m_physBones = m_avatarObject.GetComponentsInChildren<VRCPhysBone>(true);
+            CreateObjectNames();
+            CreateRootTransformNames();
+        }
+
 
         private void CreateRootTransformNames()
         {
@@ -162,6 +183,7 @@ namespace Yakumo890.VRC.PhysicsBone
                 m_rootTransformNames[i] = rootTransform != null ? rootTransform.name : "None";
             }
         }
+
 
         private void CreateObjectNames()
         {

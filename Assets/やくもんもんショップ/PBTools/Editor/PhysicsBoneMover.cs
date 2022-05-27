@@ -12,6 +12,8 @@ namespace Yakumo890.VRC.PhysicsBone
     {
         private static PhysicsBoneMoverEngine m_engine = new PhysicsBoneMoverEngine();
 
+        private bool m_canDeleteSourcePBs;
+
         [MenuItem("Yakumo890/PBTools/PhysicsBoneMover")]
         static void ShowWindow()
         {
@@ -74,12 +76,17 @@ namespace Yakumo890.VRC.PhysicsBone
                 ),
                 m_engine.IgnoreHasNoMatchPathObject);
 
-            m_engine.CanDeleteSourcePBs = EditorGUILayout.Toggle("移動後に元のPB(Collider)を削除する", m_engine.CanDeleteSourcePBs);
+            m_canDeleteSourcePBs = EditorGUILayout.Toggle("移動後に元のPB(Collider)を削除する", m_canDeleteSourcePBs);
 
             if (GUILayout.Button("移動"))
             {
                 m_engine.MovePhysBoneColliders();
                 m_engine.MovePhysBones();
+
+                if (m_canDeleteSourcePBs)
+                {
+                    m_engine.RemoveCopiedComponent();
+                }
             }
         }
 
@@ -95,17 +102,17 @@ namespace Yakumo890.VRC.PhysicsBone
         private GameObject m_srcAvatarObject;
         private GameObject m_destAvatarObject;
 
-        private VRCPhysBone[] m_physicsBones;
-        private VRCPhysBoneColliderBase[] m_physBoneColliderBases;
+        private VRCPhysBone[] m_physBones;
+        private List<VRCPhysBone> m_copiedPhysBones;
+
+        private VRCPhysBoneColliderBase[] m_colliderBases;
+        private List<VRCPhysBoneColliderBase> m_copiedColliderBase;
 
         // Root Transformと同じ名前のオブジェクトが移動先になかったら、このPB(Collider)を無視する
         private bool m_ignoreHasNoRootTransform;
 
         // PBのCollidersのうちの1つでも移動先に同じオブジェクトがなかったら、このPBを無視する
         private bool m_ignoreHasNoColliders;
-
-        // 移動したあとに元のアバターのPBを消す
-        private bool m_canDeleteSourcePBs;
 
         // 移動先にあるオブジェクトが同じ名前でも、パスが一致しなければ無視する
         private bool m_ignoreHasNoMatchPathObject;
@@ -115,8 +122,10 @@ namespace Yakumo890.VRC.PhysicsBone
         {
             m_ignoreHasNoRootTransform = true;
             m_ignoreHasNoColliders = true;
-            m_canDeleteSourcePBs = false;
             m_ignoreHasNoMatchPathObject = true;
+
+            m_copiedPhysBones = new List<VRCPhysBone>();
+            m_copiedColliderBase = new List<VRCPhysBoneColliderBase>();
         }
 
 
@@ -130,6 +139,8 @@ namespace Yakumo890.VRC.PhysicsBone
             {
                 m_srcAvatarObject = value;
                 ReloadSourceComponents();
+                m_copiedPhysBones.Clear();
+                m_copiedColliderBase.Clear();
             }
         }
 
@@ -169,19 +180,6 @@ namespace Yakumo890.VRC.PhysicsBone
             set
             {
                 m_ignoreHasNoColliders = value;
-            }
-        }
-
-
-        public bool CanDeleteSourcePBs
-        {
-            get
-            {
-                return m_canDeleteSourcePBs;
-            }
-            set
-            {
-                m_canDeleteSourcePBs = value;
             }
         }
 
@@ -229,7 +227,7 @@ namespace Yakumo890.VRC.PhysicsBone
             var tmp = new GameObject();
             tmp.name = "tmp_physicsBoneCollider_it_can_be_deleted";
 
-            foreach (var pbc in m_physBoneColliderBases)
+            foreach (var pbc in m_colliderBases)
             {
                 // Colliderがついているオブジェクトと同じ名前の、移動先のオブジェクトを取得
                 Transform targetTransform = GetSameNameObjectFromDest(pbc.gameObject);
@@ -270,11 +268,9 @@ namespace Yakumo890.VRC.PhysicsBone
                 // tmpオブジェクトは使い回すので、付けたコンポーネントは毎回削除する
                 ComponentUtility.DeleteComponent(tmpPBC);
 
-                //もしコピー元のコンポーネントを削除して良いなら、削除する
-                if (m_canDeleteSourcePBs)
-                {
-                    ComponentUtility.DeleteComponent(pbc);
-                }
+                //コンポーネントをコピー済みのコンポーネントとして登録する
+                m_copiedColliderBase.Add(pbc);
+
             }
 
             if (tmp != null)
@@ -296,7 +292,7 @@ namespace Yakumo890.VRC.PhysicsBone
             var tmp = new GameObject();
             tmp.name = "tmp_physicsBone_it_can_be_deleted";
 
-            foreach (var pb in m_physicsBones)
+            foreach (var pb in m_physBones)
             {
                 // PBがついているオブジェクトと同じ名前の、移動先のオブジェクトを取得
                 Transform targetTransform = GetSameNameObjectFromDest(pb.gameObject);
@@ -324,7 +320,17 @@ namespace Yakumo890.VRC.PhysicsBone
                 var ignore = false;
                 foreach (var col in pb.colliders)
                 {
-                    var colliderObjectTransform = GetSameNameObjectFromDest(col.gameObject);
+                    Transform colliderObjectTransform = null;
+                    // colliderはすでに移動して消えている可能性があるので、nullならば移動先から探す
+                    if (col == null)
+                    {
+
+                    }
+                    else
+                    {
+                        colliderObjectTransform = GetSameNameObjectFromDest(col.gameObject);
+                    }
+
                     if (m_ignoreHasNoColliders && colliderObjectTransform == null)
                     {
                         ignore = true;
@@ -362,11 +368,8 @@ namespace Yakumo890.VRC.PhysicsBone
                 // tmpオブジェクトは使い回すので、付けたコンポーネントは毎回削除する
                 ComponentUtility.DeleteComponent(tmpPB);
 
-                //もしコピー元のコンポーネントを削除して良いなら、削除する
-                if (m_canDeleteSourcePBs)
-                {
-                    ComponentUtility.DeleteComponent(pb);
-                }
+                // コンポーネントをコピーしたら、コピー済みのコンポーネントとして登録する
+                m_copiedPhysBones.Add(pb);
             }
 
             if (tmp != null)
@@ -376,12 +379,32 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        public void RemoveCopiedComponent()
+        {
+            foreach (var pb in m_copiedPhysBones)
+            {
+                if (pb != null)
+                {
+                    Object.DestroyImmediate(pb);
+                }
+            }
+
+            foreach (var col in m_copiedColliderBase)
+            {
+                if (col != null)
+                {
+                    Object.DestroyImmediate(col);
+                }
+            }
+        }
+
+
         public void ReloadSourceComponents()
         {
             if (m_srcAvatarObject != null)
             {
-                m_physicsBones = m_srcAvatarObject.GetComponentsInChildren<VRCPhysBone>(true);
-                m_physBoneColliderBases = m_srcAvatarObject.GetComponentsInChildren<VRCPhysBoneColliderBase>(true);
+                m_physBones = m_srcAvatarObject.GetComponentsInChildren<VRCPhysBone>(true);
+                m_colliderBases = m_srcAvatarObject.GetComponentsInChildren<VRCPhysBoneColliderBase>(true);
             }
         }
 

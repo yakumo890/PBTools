@@ -19,6 +19,8 @@ namespace Yakumo890.VRC.PhysicsBone
         {
             var window = GetWindow<PhyisicsBoneIsAnimatedChanger>();
             window.titleContent = new GUIContent("Phyiscs Bone IsAnimated Changer");
+
+            EditorApplication.hierarchyChanged += OnChanged;
         }
 
         private void OnGUI()
@@ -81,6 +83,12 @@ namespace Yakumo890.VRC.PhysicsBone
                 EditorGUILayout.EndScrollView();
             }
         }
+
+
+        private static void OnChanged()
+        {
+            m_engine.LoadPhysicsBones();
+        }
     }
 
     public class PhysicsBoneIsAnimatedChangerEngine
@@ -102,10 +110,7 @@ namespace Yakumo890.VRC.PhysicsBone
             set
             {
                 m_avatarObject = value;
-                if (m_avatarObject != null)
-                {
-                    LoadPhysicsBones();
-                }
+                LoadPhysicsBones();
             }
         }
 
@@ -169,6 +174,10 @@ namespace Yakumo890.VRC.PhysicsBone
 
         public void LoadPhysicsBones()
         {
+            if (hasNullAvatar())
+            {
+                return;
+            }
             m_physBones = m_avatarObject.GetComponentsInChildren<VRCPhysBone>(true);
             CreateObjectNames();
             CreateRootTransformNames();

@@ -303,6 +303,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 984156731, guid: 42ea336b7ce98524484eb71eaf40628a, type: 3}
+      propertyPath: blueprintId
+      value: avtr_47c0160d-038e-490f-99ae-e891cbf1df16
+      objectReference: {fileID: 0}
     - target: {fileID: 3544652904020851025, guid: 42ea336b7ce98524484eb71eaf40628a,
         type: 3}
       propertyPath: m_Name

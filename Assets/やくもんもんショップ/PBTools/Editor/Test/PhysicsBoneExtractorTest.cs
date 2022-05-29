@@ -152,6 +152,9 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         }
 
 
+        /// <summary>
+        /// 移動後のPhysBoneのコライダーが変更されるかのテスト
+        /// </summary>
         public void OverrideColliderTest()
         {
             if (m_forVRCPhysBone)
@@ -187,6 +190,7 @@ namespace Yakumo890.VRC.PhysicsBone.Test
 
             m_engine.ExtractColliders(targetObject, "C");
 
+            //PhysBoneが参照しているコライダーが移動後のコライダーになっているか
             foreach (var cor in correspondings)
             {                
                 foreach (var name in cor.Value)
@@ -197,6 +201,10 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         }
 
 
+        /// <summary>
+        /// 非アクティブなオブジェクトが無視されるかのテスト
+        /// </summary>
+        /// <param name="ignoreInactive">非アクティブなオブジェクトを無視するか(true: 無視)</param>
         public void IgnoreInactiveObjectTest(bool ignoreInactive)
         {
             var avatar = new AvatarForTest();
@@ -225,6 +233,10 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         }
 
 
+        /// <summary>
+        /// EditorOnlyのオブジェクトが無視されるかのテスト
+        /// </summary>
+        /// <param name="ignoreEditorOnly">EditorOnlyを無視するか(true: 無視)</param>
         public void IgnoreEditorOnlyObjectTest(bool ignoreEditorOnly)
         {
             var avatar = new AvatarForTest();
@@ -291,10 +303,12 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         }
 
 
+        /// <summary>
+        /// nullで問題が起きないかのテスト<br/>
+        /// 例外が起きなければ良い
+        /// </summary>
         public void NullTest()
-        {
-            // 例外が起きなければOKのテスト
-
+        {           
             var engine = new PhysicsBoneExtractorEngine(null);
 
             if (m_forVRCPhysBone)
@@ -324,6 +338,12 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         }
 
 
+        /// <summary>
+        /// PhysBoneのRoot Transformが変更されるかのテスト
+        /// </summary>
+        /// <param name="avatar">テストするアバター</param>
+        /// <param name="targetObject">PhysBoneをまとめるオブジェクト</param>
+        /// <param name="canReplaceRootTransform">Root Transformを変更してよいか</param>
         private void OverridedPhysBoneRootTransformTest(AvatarForTest avatar, GameObject targetObject, bool canReplaceRootTransform)
         {
             var movedPhysBones = targetObject.GetComponents<VRCPhysBone>();
@@ -371,6 +391,12 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         }
 
 
+        /// <summary>
+        /// PhysBoneColliderのRoot Transformが変更されるかのテスト
+        /// </summary>
+        /// <param name="avatar">テストするアバター</param>
+        /// <param name="targetObject">PhysBoneをまとめるオブジェクト</param>
+        /// <param name="canReplaceRootTransform">Root Transformを変更してよいか</param>
         private void OverridedColliderRootTransformTest(AvatarForTest avatar, GameObject targetObject, bool canReplaceRootTransform)
         {
             var movedPhysBones = targetObject.GetComponentsInChildren<VRCPhysBoneCollider>(true);
@@ -416,10 +442,17 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         }
 
 
+        /// <summary>
+        /// 対象のアバターにコンポーネントが付与されているかのテスト
+        /// </summary>
+        /// <param name="avatar">対象のアバター</param>
+        /// <param name="targetObject">まとめるオブジェクト</param>
+        /// <param name="nIgnoredObjects">無視するオブジェクト数</param>
         private void AddedComponentsToTargetTest(AvatarForTest avatar, GameObject targetObject, int nIgnoredObjects = 0)
         {
             var movedPhysBones = targetObject.GetComponentsInChildren<T>();
 
+            // コンポーネントの数が合っているかをテストする
             Assert.AreEqual(avatar.GetNumberOfComponents<T>() - nIgnoredObjects, movedPhysBones.Length);
 
             if (!m_forVRCPhysBone)
@@ -429,6 +462,12 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         }
 
 
+        /// <summary>
+        /// 対象のアバターにコライダー用オブジェクトが生成されているかのテスト
+        /// </summary>
+        /// <param name="avatar">対象のアバター</param>
+        /// <param name="targetObject">コライダーをまとめるためのルートオブジェクト</param>
+        /// <param name="nIgnoredObjects">無視するオブジェクト数</param>
         private void AddedColliderObjectsInParentTest(AvatarForTest avatar, GameObject targetObject, int nIgnoredObjects = 0)
         {
             // 子オブジェクトがコライダーの数だけあるか
@@ -443,9 +482,16 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         }
 
 
+        /// <summary>
+        /// コンポーネントが消えているかのテスト
+        /// </summary>
+        /// <param name="avatar">対象のアバター</param>
+        /// <param name="nRemainder">残っているはずのコンポーネントの数</param>
+        /// <param name="targetObject">コンポーネントをまとめたオブジェクト</param>
         private void DeletedOriginalComponentsTest(AvatarForTest avatar, int nRemainder, GameObject targetObject)
         {
             avatar.RecountComponents(targetObject);
+            // アバターのコンポーネントと、残っているはずのコンポーネントの数が一致する
             Assert.AreEqual(nRemainder, avatar.GetNumberOfComponents<T>());
         }
     }

@@ -38,9 +38,11 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             foreach (var destComponent in destComponents)
             {
                 var originalObjectTransform = srcAvatar.gameObject.FindRecursive(destComponent.name);
+                // オブジェクトが見つかっていることを保証する
                 Assert.IsNotNull(originalObjectTransform);
 
                 var srcComponent = originalObjectTransform.GetComponent<VRCPhysBone>();
+                // コンポーネントが取得できていることを保証する
                 Assert.IsNotNull(srcComponent);
 
                 // 移動したPBの値が変わっていない
@@ -77,6 +79,7 @@ namespace Yakumo890.VRC.PhysicsBone.Test
 
             var srcPBs = srcAvatar.gameObject.GetComponentsInChildren<VRCPhysBone>();
             var noRootTransformPB = Array.Find(srcPBs, x => { return x.rootTransform == null; });
+            // オブジェクトが存在していることを保証する
             Assert.IsNotNull(noRootTransformPB);
 
             noRootTransformPB.rootTransform = dummy.transform;
@@ -87,10 +90,12 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             var destNoRootTransformPB = destNoRootTransformPBObjectTransform.GetComponent<VRCPhysBone>();
             if (ignoreHasNoRootTransform)
             {
+                // IgonreHasNoRootTransformがtrueの場合、移動先にPhysBoneが移動されていない
                 Assert.IsNull(destNoRootTransformPB);
             }
             else
             {
+                // IgonreHasNoRootTransformがfalseの場合、移動先にPhysBoneが移動されている
                 Assert.IsNotNull(destNoRootTransformPB);
                 Assert.IsNull(destNoRootTransformPB.rootTransform);
             }
@@ -111,8 +116,10 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             var dummy = srcAvatar.CreateObject<VRCPhysBoneCollider>("ColliderDummy");
 
             var srcPBs = srcAvatar.gameObject.GetComponentsInChildren<VRCPhysBone>();
+            // PhysBoneがあることを保証する
             Assert.IsNotNull(srcPBs);
             var hasColliderPB = Array.Find(srcPBs, x => { return x.colliders.Count != 0; });
+            // Colliderが存在するか保証する
             Assert.IsNotNull(hasColliderPB);
 
             hasColliderPB.colliders.Add(dummy.GetComponent<VRCPhysBoneCollider>());
@@ -120,16 +127,20 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             m_engine.MovePhysBones();
 
             var destHasColliderPBTransform = destAvatar.gameObject.FindRecursive(hasColliderPB.name);
+            // 移動先に対応するオブジェクトがあることを保証する
             Assert.IsNotNull(destHasColliderPBTransform);
             var destHasColliderPB = destHasColliderPBTransform.GetComponent<VRCPhysBone>();
 
             if (ignoreHasNoCollider)
             {
+                // 移動先にコライダーと対応するオブジェクトがなければ、移動しない
                 Assert.IsNull(destHasColliderPB);
             }
             else
             {
+                // 移動先にコライダーと対応するオブジェクトがなくても、移動する
                 Assert.IsNotNull(destHasColliderPB);
+                // 移動後はコライダーを参照していたPhysBoneが、参照しなくなっている
                 Assert.AreEqual(hasColliderPB.colliders.Count - 1, destHasColliderPB.colliders.Count);
             }
         }
@@ -154,10 +165,12 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             var nAfterPBs = srcAvatar.gameObject.GetComponentsInChildren<VRCPhysBone>().Length;
             if (canDeleteSourcePBs)
             {
+                // 元のオブジェクトからPhysBoneが消えている
                 Assert.AreEqual(0, nAfterPBs);
             }
             else
             {
+                // 元のオブジェクトにPhysBoneが残っている
                 Assert.AreEqual(nBeforePBs, nAfterPBs);
             }
         }
@@ -187,15 +200,23 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             var destTestObjectPB = destTestObject.GetComponentInChildren<VRCPhysBone>();
             if (ignoreNoMatchPathObject)
             {
+                // パスが一致していない場合移動しない
                 Assert.IsNull(destTestObjectPB);
             }
             else
             {
+                // パスが一致していなくても移動できる
                 Assert.IsNotNull(destTestObjectPB);
             }
         }
 
 
+        /// <summary>
+        /// 2つのPhysBoneが等しいか
+        /// </summary>
+        /// <param name="pb1">PhysBone1</param>
+        /// <param name="pb2">PhysBone2</param>
+        /// <returns>true: pb1とpb2は等しい<br/>false: 等しくない</returns>
         // TestForAvatarはpullの値だけ違う値を入れているので
         // とりあえずpullの値が等しいかどうかで判定する
         private bool AreEqualsPB(VRCPhysBone pb1, VRCPhysBone pb2)
@@ -235,9 +256,11 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             foreach (var destComponent in destComponents)
             {
                 var originalObjectTransform = srcAvatar.gameObject.FindRecursive(destComponent.name);
+                // オブジェクトが存在するかを保証
                 Assert.IsNotNull(originalObjectTransform);
 
                 var srcComponent = originalObjectTransform.GetComponent<VRCPhysBoneCollider>();
+                // コンポーネントが存在するかを保証
                 Assert.IsNotNull(srcComponent);
 
                 // 移動したコライダーの値が変わっていない
@@ -274,6 +297,7 @@ namespace Yakumo890.VRC.PhysicsBone.Test
 
             var srcColliders = srcAvatar.gameObject.GetComponentsInChildren<VRCPhysBoneCollider>();
             var noRootTransformCollider = Array.Find(srcColliders, x => { return x.rootTransform == null; });
+            // 指定のコンポーネントがあることを保証する
             Assert.IsNotNull(noRootTransformCollider);
 
             noRootTransformCollider.rootTransform = dummy.transform;
@@ -284,10 +308,12 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             var destNoRootTransformCollider = destNoRootTransformColliderObjectTransform.GetComponent<VRCPhysBoneCollider>();
             if (ignoreHasNoRootTransform)
             {
+                // Root Transformのオブジェクトに対応するオブジェクトがなければ移動しない
                 Assert.IsNull(destNoRootTransformCollider);
             }
             else
             {
+                // Root Transformのオブジェクトに対応するオブジェクトがなくても移動する
                 Assert.IsNotNull(destNoRootTransformCollider);
                 Assert.IsNull(destNoRootTransformCollider.rootTransform);
             }
@@ -313,10 +339,12 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             var nAfterPBs = srcAvatar.gameObject.GetComponentsInChildren<VRCPhysBoneCollider>().Length;
             if (canDeleteSourcePBs)
             {
+                // もとのオブジェクトからコライダーが消えている
                 Assert.AreEqual(0, nAfterPBs);
             }
             else
             {
+                // もとのオブジェクトからコライダーが消えていない
                 Assert.AreEqual(nBeforePBs, nAfterPBs);
             }
         }
@@ -346,15 +374,23 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             var destTestObjectPB = destTestObject.GetComponentInChildren<VRCPhysBoneCollider>();
             if (ignoreNoMatchPathObject)
             {
+                // パスが一致しなければ移動しない
                 Assert.IsNull(destTestObjectPB);
             }
             else
             {
+                // パスが一致していても移動する
                 Assert.IsNotNull(destTestObjectPB);
             }
         }
 
 
+        /// <summary>
+        /// 2つのコライダーが一致するか
+        /// </summary>
+        /// <param name="pb1">PhysBoneCollider1</param>
+        /// <param name="pb2">PhysBoneCollider2</param>
+        /// <returns>true: pb1とpb2は等しい<br/>false: 等しくない</returns>
         // TestForAvatarはpullの値だけ違う値を入れているので
         // とりあえずpullの値が等しいかどうかで判定する
         private bool AreEqualsCollider(VRCPhysBoneCollider pb1, VRCPhysBoneCollider pb2)
@@ -380,22 +416,31 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         [Test]
         public void MovePhysiscsBoneTest()
         {
+            // PhysBoneが移動できるか
             m_physBoneTestBase.MovePhysBoneTest();
 
+            // Root Transformのオブジェクトに対応するオブジェクトがなければ移動しないか
             m_physBoneTestBase.IgnoreHasNoRootTransformTest(true);
 
+            // Root Transformのオブジェクトに対応するオブジェクトがなくても移動するか
             m_physBoneTestBase.IgnoreHasNoRootTransformTest(false);
 
+            // 参照しているコライダーのオブジェクトに対応するオブジェクトがなければ移動しないか
             m_physBoneTestBase.IgnoreHasNoColliderTest(true);
 
+            // 参照しているコライダーのオブジェクトに対応するオブジェクトがなくても移動するか
             m_physBoneTestBase.IgnoreHasNoColliderTest(false);
 
+            // もとのPhysBoneが消えるか
             m_physBoneTestBase.CanDeleteSourcePBsTest(true);
 
+            // もとのPhysBoneが消えないか
             m_physBoneTestBase.CanDeleteSourcePBsTest(false);
 
+            // パスが一致しなければ移動しないか
             m_physBoneTestBase.IgnoreNoMatchPathObjectTest(true);
 
+            // パスが一致しなくても移動するか
             m_physBoneTestBase.IgnoreNoMatchPathObjectTest(false);
         }
 
@@ -403,18 +448,25 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         [Test]
         public void MoveColliderTest()
         {
+            // Colliderが移動できるか
             m_colliderTestBase.MoveColliderTest();
 
+            // Root Transformのオブジェクトに対応するオブジェクトがなければ移動しないか
             m_colliderTestBase.IgnoreHasNoRootTransformTest(true);
 
+            // Root Transformのオブジェクトに対応するオブジェクトがなくても移動するか
             m_colliderTestBase.IgnoreHasNoRootTransformTest(false);
 
+            // もとのPhysBoneが消えるか
             m_colliderTestBase.CanDeleteSourcePBsTest(true);
 
+            // もとのPhysBoneが消えないか
             m_colliderTestBase.CanDeleteSourcePBsTest(false);
 
+            // パスが一致しなければ移動しないか
             m_colliderTestBase.IgnoreNoMatchPathObjectTest(true);
 
+            // パスが一致しなくても移動するか
             m_colliderTestBase.IgnoreNoMatchPathObjectTest(false);
         }
     }

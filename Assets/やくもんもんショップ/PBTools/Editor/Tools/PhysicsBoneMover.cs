@@ -8,6 +8,9 @@ using Yakumo890.Util.VRC;
 
 namespace Yakumo890.VRC.PhysicsBone
 {
+    /// <summary>
+    /// PhysicsBoneMoverのUI部分
+    /// </summary>
     public class PhysicsBoneMover : EditorWindow
     {
         private static PhysicsBoneMoverEngine m_engine = new PhysicsBoneMoverEngine();
@@ -102,12 +105,19 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// ヒエラルキーに変更があった場合の処理<br/>
+        /// 移動元のアバターのPhysBone(Collider)を読み込む
+        /// </summary>
         private static void OnChanged()
         {
             m_engine.ReloadSourceComponents();            
         }
     }
 
+    /// <summary>
+    /// PhysicsBoneMoverのエンジン
+    /// </summary>
     public class PhysicsBoneMoverEngine
     {
         private GameObject m_srcAvatarObject;
@@ -119,16 +129,23 @@ namespace Yakumo890.VRC.PhysicsBone
         private VRCPhysBoneColliderBase[] m_colliderBases;
         private List<VRCPhysBoneColliderBase> m_copiedColliderBase;
 
-        // Root Transformと同じ名前のオブジェクトが移動先になかったら、このPB(Collider)を無視する
+        // Root Transformと同じ名前のオブジェクトが移動先になかったら、このPB(Collider)を移動しない
         private bool m_ignoreHasNoRootTransform;
 
-        // PBのCollidersのうちの1つでも移動先に同じオブジェクトがなかったら、このPBを無視する
+        // PBのCollidersのうちの1つでも移動先に同じオブジェクトがなかったら、このPBを移動しない
         private bool m_ignoreHasNoColliders;
 
-        // 移動先にあるオブジェクトが同じ名前でも、パスが一致しなければ無視する
+        // 移動先にあるオブジェクトが同じ名前でも、パスが一致しなければ移動しない
         private bool m_ignoreHasNoMatchPathObject;
 
 
+        /// <summary>
+        /// コンストラクタ<br/>
+        /// <br/>
+        /// Root Transformのオブジェクトに対応するオブジェクトが移動先になかったら、移動しない<br/>
+        /// PhysBoneのColliderオブジェクトに対応するオブジェクトが移動先になかったら、移動しない<br/>
+        /// 対応するオブジェクト名が、パスが完全に一致しなければ移動しない<br/>
+        /// </summary>
         public PhysicsBoneMoverEngine()
         {
             m_ignoreHasNoRootTransform = true;
@@ -140,6 +157,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// 移動元のアバターオブジェクト
+        /// </summary>
         public GameObject SrcAvatarObject
         {
             get
@@ -156,6 +176,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// 移動先のアバターオブジェクト
+        /// </summary>
         public GameObject DestAvatarObject
         {
             get
@@ -169,6 +192,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// Root Transformと同じ名前のオブジェクトが移動先になかったら、このPB(Collider)を移動しない
+        /// </summary>
         public bool IgnoreHasNoRootTransform
         {
             get
@@ -182,6 +208,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// PBのCollidersのうちの1つでも移動先に同じオブジェクトがなかったら、このPBを移動しない
+        /// </summary>
         public bool IgnoreHasNoColliders
         {
             get
@@ -195,6 +224,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// 移動先にあるオブジェクトが同じ名前でも、パスが一致しなければ移動しない
+        /// </summary>
         public bool IgnoreHasNoMatchPathObject
         {
             get
@@ -208,24 +240,40 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// 移動元のアバターオブジェクトがアバターであるか
+        /// </summary>
+        /// <returns>true: アバター<br/>false: アバターでない</returns>
         public bool CheckSrcIsAvatar()
         {
             return CheckIsAvatar(m_srcAvatarObject);
         }
 
 
+        /// <summary>
+        /// 移動先のアバターオブジェクトがアバターであるか
+        /// </summary>
+        /// <returns>true: アバター<br/>false: アバターでない</returns>
         public bool CheckDestIsAvatar()
         {
             return CheckIsAvatar(m_destAvatarObject);
         }
 
 
+        /// <summary>
+        /// アバターオブジェクトがnullか
+        /// </summary>
+        /// <returns>true: 移動元か移動先のアバターのどちらかがnull<br/>false: どちらもnullでない</returns>
         public bool HasNullAvatar()
         {
             return m_srcAvatarObject == null || m_destAvatarObject == null;
         }
 
 
+        /// <summary>
+        /// PhsyBoneColliderを移動する
+        /// </summary>
+        /// <returns>true: 処理成功<br/>false: 処理失敗</returns>
         public bool MovePhysBoneColliders()
         {
             if (HasNullAvatar())
@@ -293,6 +341,10 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// PhsyBoneを移動する
+        /// </summary>
+        /// <returns>true: 処理成功<br/>false: 処理失敗</returns>
         public bool MovePhysBones()
         {
             if (HasNullAvatar())
@@ -386,6 +438,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// 移動したPhysBone(Collider)を移動元から削除する
+        /// </summary>
         public void RemoveCopiedComponent()
         {
             foreach (var pb in m_copiedPhysBones)
@@ -406,6 +461,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// 移動元のアバターのPhysBone(Collider)を削除する
+        /// </summary>
         public void ReloadSourceComponents()
         {
             if (m_srcAvatarObject != null)
@@ -414,6 +472,7 @@ namespace Yakumo890.VRC.PhysicsBone
                 m_colliderBases = m_srcAvatarObject.GetComponentsInChildren<VRCPhysBoneColliderBase>(true);
             }
         }
+
 
         /// <summary>
         /// 移動先のアバターから、同じ名前のオブジェクトを取得する
@@ -436,6 +495,11 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// オブジェクトがアバターかどうか
+        /// </summary>
+        /// <param name="avatar">対象のオブジェクト</param>
+        /// <returns>true: アバターである<br/>false: アバターでない</returns>
         private bool CheckIsAvatar(GameObject avatar)
         {
             return avatar != null && AvatarUtility.IsAvatar(avatar);

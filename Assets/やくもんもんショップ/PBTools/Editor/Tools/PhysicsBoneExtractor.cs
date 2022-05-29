@@ -8,6 +8,9 @@ using Yakumo890.Util.VRC;
 
 namespace Yakumo890.VRC.PhysicsBone
 {
+    /// <summary>
+    /// PhysicsBoneExtractorのUI部分
+    /// </summary>
     public class PhysicsBoneExtractor : EditorWindow
     {
         private static PhysicsBoneExtractorEngine m_engine = new PhysicsBoneExtractorEngine();
@@ -165,6 +168,9 @@ namespace Yakumo890.VRC.PhysicsBone
     }
 
 
+    /// <summary>
+    /// PhysicsBoneExtractorのエンジン部分
+    /// </summary>
     public class PhysicsBoneExtractorEngine
     {
         private GameObject m_avatarObject;
@@ -174,25 +180,52 @@ namespace Yakumo890.VRC.PhysicsBone
         private bool m_canReplaceRootTransform;
 
 
+        /// <summary>
+        /// コンストラクタ<br />
+        /// <br/>
+        /// 設定:<br/>
+        /// 非アクティブオブジェクトを無視する<br/>
+        /// EditorOnlyオブジェクトを無視する<br/>
+        /// nullなRootTransformの変更を許可<br/>
+        /// </summary>
         public PhysicsBoneExtractorEngine() : this(null, false, false, true)
         {
         }
 
 
+        /// <summary>
+        /// コンストラクタ<br />
+        /// <br/>
+        /// 設定:<br/>
+        /// 非アクティブオブジェクトを無視する<br/>
+        /// EditorOnlyオブジェクトを無視する<br/>
+        /// nullなRootTransformの変更を許可<br/>
+        /// </summary>
+        /// <param name="avatarObject">PBを一つにまとめるアバター</param>
         public PhysicsBoneExtractorEngine(GameObject avatarObject) : this(avatarObject, false, false, true)
         {
         }
 
 
-        public PhysicsBoneExtractorEngine(GameObject avatarObject, bool ignoreInactive, bool ignoreEditorOnly, bool canReplaceTransform)
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="avatarObject">PBを一つにまとめるアバター</param>
+        /// <param name="ignoreInactive">非アクティブオブジェクトを無視するかどうか(true: 無視)</param>
+        /// <param name="ignoreEditorOnly">EditorOnlyオブジェクトを無視するかどうか(true: 無視)</param>
+        /// <param name="canReplaceRootTransform">nullなRootTransformを変更して良いかどうか(true: 変更可能)</param>
+        public PhysicsBoneExtractorEngine(GameObject avatarObject, bool ignoreInactive, bool ignoreEditorOnly, bool canReplaceRootTransform)
         {
             m_avatarObject = avatarObject;
             m_ignoreInactive = ignoreInactive;
             m_ignoreEditorOnly = ignoreEditorOnly;
-            m_canReplaceRootTransform = canReplaceTransform;
+            m_canReplaceRootTransform = canReplaceRootTransform;
         }
 
 
+        /// <summary>
+        /// 対象のアバターオブジェクト
+        /// </summary>
         public GameObject AvatarObject
         {
             get
@@ -207,6 +240,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// 非アクティブオブジェクトを無視するかどうか
+        /// </summary>
         public bool IgnoreInactive
         {
             get
@@ -221,6 +257,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// EditorOnlyオブジェクトを無視するかどうか
+        /// </summary>
         public bool IgnoreEditorOnly
         {
             get
@@ -235,6 +274,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// nullのRoot Transformを変更してよいかどうか
+        /// </summary>
         public bool CanReplaceRootTransform
         {
             get
@@ -249,18 +291,33 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// アバターオブジェクトがnullかどうか
+        /// </summary>
+        /// <returns>true: オブジェクトがnull<br/>false: nullでない</returns>
         public bool hasNullAvatar()
         {
             return AvatarObject == null;
         }
 
 
+        /// <summary>
+        /// アバターオブジェクトがアバターであるかどうか
+        /// </summary>
+        /// <returns>true: アバターオブジェクト<br/>false: アバターオブジェクトでない</returns>
         public bool AvatarObjectIsAvatar()
         {
             return AvatarObject != null && AvatarUtility.IsAvatar(AvatarObject);
         }
 
 
+
+        /// <summary>
+        /// PhysicsBoneColliderをまとめる
+        /// </summary>
+        /// <param name="target">コライダーをまとめるためのルートオブジェクト</param>
+        /// <param name="colliderObjectPrefix">コライダーが付いたオブジェクトの名前のプレフィックス</param>
+        /// <returns>true: 処理成功<br/>false: 処理失敗</returns>
         public bool ExtractColliders(GameObject target, string colliderObjectPrefix)
         {
             if (m_avatarObject == null)
@@ -351,6 +408,12 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// PhysicsBoneColliderをまとめる
+        /// </summary>
+        /// <param name="pbColliderRootObjectName">コライダーをまとめるためのルートオブジェクト名(新規作成)</param>
+        /// <param name="colliderObjectPrefix">コライダーが付いたオブジェクトの名前のプレフィックス</param>
+        /// <returns>true: 処理成功<br/>false: 処理失敗</returns>
         public bool ExtractColliders(string pbColliderRootObjectName, string colliderObjectPrefix)
         {
             if (pbColliderRootObjectName == null)
@@ -365,6 +428,11 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// PhysicsBoneをまとめる
+        /// </summary>
+        /// <param name="targetObject">PhysicsBoneをまとめるオブジェクト</param>
+        /// <returns>true: 処理成功<br/>false: 処理失敗</returns>
         public bool ExtractPhysBones(GameObject targetObject)
         {
             if (m_avatarObject == null)
@@ -395,6 +463,11 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// PhysicsBoneをまとめる
+        /// </summary>
+        /// <param name="pbObjectName">PhysicsBoneをまとめるオブジェクト名(新規作成)</param>
+        /// <returns>true: 処理成功<br/>false: 処理失敗</returns>
         public bool ExtractPhysBones(string pbObjectName)
         {
             if (pbObjectName == null)
@@ -409,6 +482,11 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// コライダーとそれを参照するPhysBoneの対応リストに新しく対応を追加する
+        /// </summary>
+        /// <param name="pb">新たに対応を追加したいPhysBone</param>
+        /// <param name="correspondings">対応リスト</param>
         private void AddColliderCorrespondings(VRCPhysBone pb, Dictionary<VRCPhysBoneColliderBase, List<VRCPhysBone>> correspondings)
         {
             foreach (var collider in pb.colliders)

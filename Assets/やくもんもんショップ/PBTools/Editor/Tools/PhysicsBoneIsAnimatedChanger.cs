@@ -6,6 +6,9 @@ using Yakumo890.Util.VRC;
 
 namespace Yakumo890.VRC.PhysicsBone
 {
+    /// <summary>
+    /// PhyisicsBoneIsAnimatedChangerのUI部分
+    /// </summary>
     public class PhyisicsBoneIsAnimatedChanger : EditorWindow
     {
         private static PhysicsBoneIsAnimatedChangerEngine m_engine = new PhysicsBoneIsAnimatedChangerEngine();
@@ -85,12 +88,20 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// ヒエラルキーに変更があった場合の処理<br/>
+        /// アバターが持つPB一覧を取得し直す
+        /// </summary>
         private static void OnChanged()
         {
             m_engine.LoadPhysicsBones();
         }
     }
 
+
+    /// <summary>
+    /// PhysicsBoneIsAnimatedChangerのエンジン
+    /// </summary>
     public class PhysicsBoneIsAnimatedChangerEngine
     {
         delegate void PhysicsBoneHandler(VRCPhysBone physBone);
@@ -101,6 +112,9 @@ namespace Yakumo890.VRC.PhysicsBone
         private string[] m_objectNames = null;
         private string[] m_rootTransformNames = null;
 
+        /// <summary>
+        /// 対象のアバターオブジェクト
+        /// </summary>
         public GameObject AvatarObject
         {
             get
@@ -114,6 +128,10 @@ namespace Yakumo890.VRC.PhysicsBone
             }
         }
 
+
+        /// <summary>
+        /// アバターが持つPhysBoneの数
+        /// </summary>
         public int Count
         {
             get 
@@ -122,6 +140,10 @@ namespace Yakumo890.VRC.PhysicsBone
             }
         }
 
+
+        /// <summary>
+        /// PhysBoneがついているオブジェクト名の一覧
+        /// </summary>
         public string[] ObjectNames
         {
             get
@@ -130,6 +152,11 @@ namespace Yakumo890.VRC.PhysicsBone
             }
         }
 
+
+        /// <summary>
+        /// PhysBoneのRootTransformにセットされているオブジェクト名の一覧<br/>
+        /// nullの場合は"None"になる
+        /// </summary>
         public string[] RootTransformNames
         {
             get
@@ -138,6 +165,12 @@ namespace Yakumo890.VRC.PhysicsBone
             }
         }
 
+
+        /// <summary>
+        /// PhysBoneに配列のようにアクセスできる
+        /// </summary>
+        /// <param name="index">インデックス</param>
+        /// <returns>指定したインデックスにあるPhysBone</returns>
         public bool this[int index]
         {
             get
@@ -151,18 +184,29 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// アバターオブジェクトがnullかどうか
+        /// </summary>
+        /// <returns>true: オブジェクトがnull<br/>false: nullでない</returns>
         public bool hasNullAvatar()
         {
             return AvatarObject == null;
         }
 
 
+        /// <summary>
+        /// アバターオブジェクトがアバターであるかどうか
+        /// </summary>
+        /// <returns>true: アバターオブジェクト<br/>false: アバターオブジェクトでない</returns>
         public bool AvatarObjectIsAvatar()
         {
             return AvatarObject != null && AvatarUtility.IsAvatar(AvatarObject);
         }
 
 
+        /// <summary>
+        /// PhysBoneのIsAnimatedをすべてOFFにする
+        /// </summary>
         public void TurnOffAll()
         {
             foreach (var pb in m_physBones)
@@ -172,6 +216,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// アバターのPhysBoneをすべて取得する
+        /// </summary>
         public void LoadPhysicsBones()
         {
             if (hasNullAvatar())
@@ -184,6 +231,9 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+        /// <summary>
+        /// すべてのPhysBoneのRoot Transformのオブジェクトの名前を取得し格納する
+        /// </summary>
         private void CreateRootTransformNames()
         {
             m_rootTransformNames = new string[Count];
@@ -196,6 +246,10 @@ namespace Yakumo890.VRC.PhysicsBone
         }
 
 
+
+        /// <summary>
+        /// すべてのPhysBoneがついているオブジェクトの名前を取得し格納する
+        /// </summary>
         private void CreateObjectNames()
         {
             m_objectNames = new string[Count];

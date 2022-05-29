@@ -2,6 +2,9 @@
 
 namespace Yakumo890.Util.VRC
 {
+    /// <summary>
+    /// アバターに関するユーティリティ
+    /// </summary>
     public class AvatarUtility
     {
         /// <summary>

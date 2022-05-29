@@ -46,21 +46,30 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         }
 
 
+        /// <summary>
+        /// プロパティが正常に設定されるか
+        /// </summary>
         [Test]
         public void PropertyTest()
         {
+            // PhysBoneの数が正常化
             Assert.AreEqual(m_engine.Count, m_physBones.Length);
 
             string[] objectNames = m_engine.ObjectNames;
+            // PhysBoneがついているオブジェクトの数が2
             Assert.AreEqual(objectNames.Length, 2);
+            // PhysBoneがついているオブジェクトの名前が正常に取得できるか
             Assert.IsNotNull(Array.Find(objectNames, x => { return x == RootObjectName; }));
             Assert.IsNotNull(Array.Find(objectNames, x => { return x == ChildObjectName; }));
 
             string[] rootTransformNames = m_engine.RootTransformNames;
+            // Root Transformに設定されているオブジェクト名の数が2
             Assert.AreEqual(rootTransformNames.Length, 2);
+            // PhysBoneのRoot Transformについているオブジェクトの名前が正常に取得できるか
             Assert.IsNotNull(Array.Find(rootTransformNames, x => { return x == RootTransformObjectName; }));
             Assert.IsNotNull(Array.Find(rootTransformNames, x => { return x == "None"; }));
         }
+
 
         [Test]
         public void TurnOffAllTest()
@@ -72,11 +81,13 @@ namespace Yakumo890.VRC.PhysicsBone.Test
 
             m_engine.TurnOffAll();
 
+            // すべてのIsAnimatedがfalseになっているか
             foreach (var pb in m_physBones)
             {
                 Assert.IsFalse(pb.isAnimated);
             }
         }
+
 
         [Test]
         public void ChangeIsAniamtedTest()
@@ -91,6 +102,7 @@ namespace Yakumo890.VRC.PhysicsBone.Test
                 m_engine[i] = true;
             }
 
+            // 個別にIsAnmatedを設定できるか
             foreach (var pb in m_physBones)
             {
                 Assert.IsTrue(pb.isAnimated);

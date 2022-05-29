@@ -34,15 +34,18 @@ namespace Yakumo890.Util.Test
         public void GetFullPathTest()
         {
             var rootFullPath = rootObject.transform.GetFullPath();
+            // ルートオブジェクトのフルパスが取得できる
             Assert.AreEqual(rootFullPath, RootObjectName);
 
             var expectedChildFullPathIgnoredRoot = $"{ParentObjectName}/{ChildObjectName}";
             var expectedChildFullPath = $"{RootObjectName}/{expectedChildFullPathIgnoredRoot}";
 
             var childFullPath = childObject.transform.GetFullPath();
+            // 子オブジェクトのフルパスが取得できる
             Assert.AreEqual(childFullPath, expectedChildFullPath);
 
             var childFullPathIgnoredRoot = childObject.transform.GetFullPath(true);
+            // ルートオブジェクトを抜かしてフルパスが取得できる
             Assert.AreEqual(childFullPathIgnoredRoot, expectedChildFullPathIgnoredRoot);
         }
 
@@ -50,7 +53,9 @@ namespace Yakumo890.Util.Test
         [Test]
         public void FindRecursiveSuccessTest()
         {
+            // ルートオブジェクトが再帰的検索で見つかる
             Assert.IsNotNull(rootObject.FindRecursive(ParentObjectName));
+            // 子オブジェクトが再帰的検索で見つかる
             Assert.IsNotNull(rootObject.FindRecursive(ChildObjectName));
         }
 
@@ -58,6 +63,7 @@ namespace Yakumo890.Util.Test
         [Test]
         public void FindRecursiveFailureTest()
         {
+            // 存在しないオブジェクトが見つからない
             Assert.IsNull(rootObject.FindRecursive("NotFoundObjectName"));
         }
 
@@ -67,7 +73,7 @@ namespace Yakumo890.Util.Test
         {
             var obj = new GameObject();
             obj.ToEditorOnly();
-
+            // EditorOnlyタグになっているか
             Assert.AreEqual(obj.tag, "EditorOnly");
         }
 
@@ -77,7 +83,7 @@ namespace Yakumo890.Util.Test
         {
             var obj = new GameObject();
             obj.tag = "EditorOnly";
-
+            // EditorOnlyタグであるオブジェクトに対してtrueになる
             Assert.IsTrue(obj.IsEditorOnly());
         }
     }

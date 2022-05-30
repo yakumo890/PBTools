@@ -1,4 +1,11 @@
-﻿using UnityEngine;
+﻿/*
+Copyright (c) 2022 yakumo/yakumonmon shop
+https://yakumonmon-shop.booth.pm/
+This software is released under the MIT License
+https://github.com/yakumo890/PBTools/License.txt
+*/
+
+using UnityEngine;
 
 namespace Yakumo890.Util
 {

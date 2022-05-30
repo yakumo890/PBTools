@@ -1,4 +1,11 @@
-﻿// TODO: TestBaseの共通化
+﻿/*
+Copyright (c) 2022 yakumo/yakumonmon shop
+https://yakumonmon-shop.booth.pm/
+This software is released under the MIT License
+https://github.com/yakumo890/PBTools/License.txt
+*/
+
+// TODO: TestBaseの共通化
 
 using NUnit.Framework;
 using System;

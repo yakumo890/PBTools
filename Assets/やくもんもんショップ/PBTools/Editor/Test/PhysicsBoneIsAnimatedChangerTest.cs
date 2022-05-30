@@ -1,4 +1,11 @@
-﻿using NUnit.Framework;
+﻿/*
+Copyright (c) 2022 yakumo/yakumonmon shop
+https://yakumonmon-shop.booth.pm/
+This software is released under the MIT License
+https://github.com/yakumo890/PBTools/License.txt
+*/
+
+using NUnit.Framework;
 using System;
 using UnityEngine;
 using VRC.SDK3.Dynamics.PhysBone.Components;

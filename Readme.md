@@ -38,5 +38,5 @@ yakumo
 
 ## Licence
 
-[MIT License](https://github.com/yakumo890/PBTools/License.txt)
+[MIT License](https://github.com/yakumo890/PBTools/blob/master/License.txt)
 

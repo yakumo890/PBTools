@@ -136,8 +136,8 @@ namespace Yakumo890.VRC.PhysicsBone
                     return;
                 }
 
-                bool extractedBones = false;
-                bool extractedColliders = false;
+                bool extractedBones = !m_willExtractPhysBone;
+                bool extractedColliders = !m_willExtractColliders;
                 if (m_willExtractPhysBone)
                 {
                     if (m_physBoneObject)

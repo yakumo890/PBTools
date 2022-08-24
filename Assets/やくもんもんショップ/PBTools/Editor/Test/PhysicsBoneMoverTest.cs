@@ -6,7 +6,7 @@ https://github.com/yakumo890/PBTools/License.txt
 */
 
 // TODO: TestBaseの共通化
-
+using System.Linq;
 using NUnit.Framework;
 using System;
 using UnityEngine;
@@ -23,7 +23,6 @@ namespace Yakumo890.VRC.PhysicsBone.Test
         {
             m_engine = new PhysicsBoneMoverEngine();
         }
-
 
         public void MovePhysBoneTest()
         {
@@ -55,22 +54,36 @@ namespace Yakumo890.VRC.PhysicsBone.Test
                 // 移動したPBの値が変わっていない
                 Assert.IsTrue(AreEqualsPB(srcComponent, destComponent));
 
-                if (srcComponent.rootTransform == null)
+                // rootTransformがnullでないとき、コンポーネントがついているオブジェクトに対応するオブジェクトが指定されるか
+                if (srcComponent.rootTransform != null)
                 {
-                    continue;
+                    // オブジェクト名を比較する
+                    Assert.AreEqual(srcComponent.name, destComponent.rootTransform.name);
+                    // 移動先のオブジェクトを参照しているか
+                    Assert.AreEqual(destAvatar.gameObject.name, destComponent.rootTransform.root.name);
                 }
 
-                // rootTransformがnullでないとき、コンポーネントがついているオブジェクトに対応するオブジェクトが指定されるか
-                // オブジェクト名を比較する
-                Assert.AreEqual(srcComponent.name, destComponent.rootTransform.name);
-                // 移動先のオブジェクトを参照しているか
-                Assert.AreEqual(destAvatar.gameObject.name, destComponent.rootTransform.root.name);
+                // ignoreTransformsが設定されている時、対応するオブジェクトが指定されているか
+                if (srcComponent.ignoreTransforms.Count > 0)
+                {
+                    // 移動先のignoreTransformsが設定されていない
+                    Assert.AreNotEqual(0, destComponent.ignoreTransforms);
+
+                    foreach (var ig in srcComponent.ignoreTransforms)
+                    {
+                        // オブジェクト名を比較する
+                        var result = destComponent.ignoreTransforms.Where(x => x.name == ig.name);
+                        Assert.AreEqual(1, result.Count());
+
+                        // 移動先のオブジェクトを参照しているか
+                        Assert.AreEqual(destAvatar.gameObject.name, result.First().root.name);
+                    }
+                }
             }
 
             // 移動元には移動先にはないオブジェクトがあるため、移動後のPBの数は1すくなる
             Assert.AreEqual(srcComponents.Length - 1, destComponents.Length);
         }
-
 
         public void IgnoreHasNoRootTransformTest(bool ignoreHasNoRootTransform)
         {
@@ -108,7 +121,6 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             }
         }
 
-
         public void IgnoreHasNoColliderTest(bool ignoreHasNoCollider)
         {
             var srcAvatar = new AvatarForTest("SrcAvatar", true);
@@ -119,7 +131,7 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             m_engine.IgnoreHasNoColliders = ignoreHasNoCollider;
 
             // 移動先にないコライダーを、すでにコライダーを参照しているPBに追加する
-            // (コライダーのどれか一つでも見つからなければ無視するという仕様のため、コライダーが複数あるPBでテストする)
+            // (コライダーのどれか一つでも見つからなければ無視するという仕様のため、コライダーがすでにあるPBでテストする)
             var dummy = srcAvatar.CreateObject<VRCPhysBoneCollider>("ColliderDummy");
 
             var srcPBs = srcAvatar.gameObject.GetComponentsInChildren<VRCPhysBone>();
@@ -152,6 +164,48 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             }
         }
 
+        public void IgnoreHasNoIgnoreBoneTest(bool ignoreHasNoIgnoreTransforms)
+        {
+            var srcAvatar = new AvatarForTest("SrcAvatar", true);
+            var dstAvatar = new AvatarForTest("DstAvatar", false);
+            m_engine.SrcAvatarObject = srcAvatar.gameObject;
+            m_engine.DestAvatarObject = dstAvatar.gameObject;
+
+            m_engine.IgnoreHasNoIgnoreTransforms = ignoreHasNoIgnoreTransforms;
+
+            // 移動先にないBoneを、すでにIgnore Transformを参照しているPBに追加する
+            // (Ignore Transformsのどれか一つでも見つからなければ無視するという仕様のため、Ignore TransformがすでにあるPBでテストする)
+            var dummy = srcAvatar.CreateObject<VRCPhysBone>("BoneDummy");
+
+            var srcPBs = srcAvatar.gameObject.GetComponentsInChildren<VRCPhysBone>();
+            // PhysBoneがあることを保証する
+            Assert.IsNotNull(srcPBs);
+            var hasIgnoreTransformsPB = Array.Find(srcPBs, x => { return x.ignoreTransforms.Count != 0; });
+            // Boneが存在するか保証する
+            Assert.IsNotNull(hasIgnoreTransformsPB);
+
+            hasIgnoreTransformsPB.ignoreTransforms.Add(dummy.transform);
+
+            m_engine.MovePhysBones();
+
+            var dstHasIgnoreTransformsPBTransform = dstAvatar.gameObject.FindRecursive(hasIgnoreTransformsPB.name);
+            // 移動先に対応するオブジェクトがあることを保証する
+            Assert.IsNotNull(dstHasIgnoreTransformsPBTransform);
+            var dstHasIgnoreTransformsPB = dstHasIgnoreTransformsPBTransform.GetComponent<VRCPhysBone>();
+
+            if (ignoreHasNoIgnoreTransforms)
+            {
+                // 移動先にBoneと対応するオブジェクトがなければ、移動しない
+                Assert.IsNull(dstHasIgnoreTransformsPB);
+            }
+            else
+            {
+                // 移動先にBoneと対応するオブジェクトがなくても、移動する
+                Assert.IsNotNull(dstHasIgnoreTransformsPB);
+                // 移動後はBoneを参照していたPhysBoneが、参照しなくなっている
+                Assert.AreEqual(hasIgnoreTransformsPB.ignoreTransforms.Count - 1, dstHasIgnoreTransformsPB.ignoreTransforms.Count);
+            }
+        }
 
         public void CanDeleteSourcePBsTest(bool canDeleteSourcePBs)
         {
@@ -181,7 +235,6 @@ namespace Yakumo890.VRC.PhysicsBone.Test
                 Assert.AreEqual(nBeforePBs, nAfterPBs);
             }
         }
-
 
         public void IgnoreNoMatchPathObjectTest(bool ignoreNoMatchPathObject)
         {
@@ -431,6 +484,12 @@ namespace Yakumo890.VRC.PhysicsBone.Test
 
             // Root Transformのオブジェクトに対応するオブジェクトがなくても移動するか
             m_physBoneTestBase.IgnoreHasNoRootTransformTest(false);
+
+            // Ignore Transformsのオブジェクトに対応するオブジェクトがなければ移動しないか
+            m_physBoneTestBase.IgnoreHasNoIgnoreBoneTest(true);
+
+            // Ignore Transformsのオブジェクトに対応するオブジェクトがなくても移動するか
+            m_physBoneTestBase.IgnoreHasNoIgnoreBoneTest(false);
 
             // 参照しているコライダーのオブジェクトに対応するオブジェクトがなければ移動しないか
             m_physBoneTestBase.IgnoreHasNoColliderTest(true);

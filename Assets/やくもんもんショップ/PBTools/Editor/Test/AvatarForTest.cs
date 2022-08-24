@@ -53,6 +53,7 @@ namespace Yakumo890.VRC.PhysicsBone.Test
 
         private GameObject m_bone1;
         private GameObject m_bone2;
+        private GameObject m_bone3;
         private GameObject m_colliderObject1;
         private GameObject m_colliderObject2;
 
@@ -306,6 +307,15 @@ namespace Yakumo890.VRC.PhysicsBone.Test
             m_nameOfPhysBoneRootTransform = m_bone2.name;
             physbone2.pull = Random.value; // 適当に値を変えておく
 
+            var physbone3 = m_bone3.GetComponent<VRCPhysBone>();
+            if (physbone3 == null)
+            {
+                physbone3 = AddComponent<VRCPhysBone>(m_bone3);
+            }
+            physbone3.rootTransform = m_bone3.transform;
+            physbone3.ignoreTransforms.Add(m_bone2.transform);
+            physbone3.pull = Random.value; // 適当に値を変えておく
+
             var collider1 = m_colliderObject1.GetComponent<VRCPhysBoneCollider>();
             if (collider1 == null)
             {
@@ -337,6 +347,7 @@ namespace Yakumo890.VRC.PhysicsBone.Test
 
             m_bone1 = AvatarUtility.CreateAvatarObject(armature, "Bone1");
             m_bone2 = AvatarUtility.CreateAvatarObject(armature, "Bone2");
+            m_bone3 = AvatarUtility.CreateAvatarObject(armature, "Bone3");
 
             m_colliderObject1 = AvatarUtility.CreateAvatarObject(m_bone1, "Collider1");
             m_colliderObject2 = AvatarUtility.CreateAvatarObject(m_bone1, "Collider2");

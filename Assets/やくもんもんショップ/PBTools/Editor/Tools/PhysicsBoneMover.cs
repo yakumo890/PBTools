@@ -79,6 +79,12 @@ namespace Yakumo890.VRC.PhysicsBone
                     "移動先にColliderがないなら無視する",
                     "PBについているColliderのどれか1つでも同じ名前のオブジェクトが移動先にないならPBの移動をしない"));
 
+            m_engine.IgnoreHasNoIgnoreTransforms = GUILayout.Toggle(
+                m_engine.IgnoreHasNoIgnoreTransforms,
+                new GUIContent(
+                    "移動先にIgnore Transfromsがないなら無視する",
+                    "PBについているIgnore Transformsのどれか1つでも同じ名前のオブジェクトが移動先にないならPBの移動をしない"));
+
             m_engine.IgnoreHasNoMatchPathObject = GUILayout.Toggle(
                 m_engine.IgnoreHasNoMatchPathObject,
                 new GUIContent(
@@ -139,12 +145,14 @@ namespace Yakumo890.VRC.PhysicsBone
         // Root Transformと同じ名前のオブジェクトが移動先になかったら、このPB(Collider)を移動しない
         private bool m_ignoreHasNoRootTransform;
 
+        // Ignore Transformsのうち1つでも移動先に同じオブジェクトがなかったら、このPBを移動しない
+        private bool m_ignoreHasNoIgnoreTransforms;
+
         // PBのCollidersのうちの1つでも移動先に同じオブジェクトがなかったら、このPBを移動しない
         private bool m_ignoreHasNoColliders;
 
         // 移動先にあるオブジェクトが同じ名前でも、パスが一致しなければ移動しない
         private bool m_ignoreHasNoMatchPathObject;
-
 
         /// <summary>
         /// コンストラクタ<br/>
@@ -158,6 +166,7 @@ namespace Yakumo890.VRC.PhysicsBone
             m_ignoreHasNoRootTransform = true;
             m_ignoreHasNoColliders = true;
             m_ignoreHasNoMatchPathObject = true;
+            m_ignoreHasNoIgnoreTransforms = true;
 
             m_copiedPhysBones = new List<VRCPhysBone>();
             m_copiedColliderBase = new List<VRCPhysBoneColliderBase>();
@@ -230,6 +239,21 @@ namespace Yakumo890.VRC.PhysicsBone
             }
         }
 
+
+        /// <summary>
+        /// PBのIgnore Transformsのうちの1つでも移動先に同じオブジェクトがなかったら、このPBを移動しない
+        /// </summary>
+        public bool IgnoreHasNoIgnoreTransforms
+        {
+            get
+            {
+                return m_ignoreHasNoIgnoreTransforms;
+            }
+            set
+            {
+                m_ignoreHasNoIgnoreTransforms = value;
+            }
+        }
 
         /// <summary>
         /// 移動先にあるオブジェクトが同じ名前でも、パスが一致しなければ移動しない
@@ -387,9 +411,33 @@ namespace Yakumo890.VRC.PhysicsBone
                     }
                 }
 
+                var ignore = false;
+
+                var ignoreTransforms = new List<Transform>();
+                foreach (var ig in pb.ignoreTransforms)
+                {
+                    var targetIgnoreTransform = GetSameNameObjectFromDest(ig.gameObject);
+
+                    if (m_ignoreHasNoIgnoreTransforms && targetIgnoreTransform == null)
+                    {
+                        ignore = true;
+                        break;
+                    }
+
+                    if (targetIgnoreTransform != null)
+                    {
+                        ignoreTransforms.Add(targetIgnoreTransform);
+                    }
+                }
+
+                // IgnoreBoneが1つでも移動先になければ無視
+                if (ignore)
+                {
+                    continue;
+                }
+
                 // PBのコライダーを移動先のアバターから探す
                 var colliders = new List<VRCPhysBoneColliderBase>();
-                var ignore = false;
                 foreach (var col in pb.colliders)
                 {
                     Transform colliderObjectTransform = null;
@@ -425,6 +473,7 @@ namespace Yakumo890.VRC.PhysicsBone
                 var tmpPB = tmp.GetComponent<VRCPhysBone>();
                 tmpPB.rootTransform = targetRootTransform;
                 tmpPB.colliders = colliders;
+                tmpPB.ignoreTransforms = ignoreTransforms;
 
                 // 移動先のコライダーコンポーネントををリストに追加
                 ComponentUtility.CopyPaseteComponentAsNew(tmpPB, targetTransform.gameObject);

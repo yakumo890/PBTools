@@ -1,0 +1,206 @@
+■ Extractorのテストについて
+# Extractorのテスト項目
+E1 「PhysicsBoneをまとめる」が機能する
+    E1.1 チェック時にPBがまとめられる
+        e1.1.1 同じパラメータでまとめられる
+        e1.1.2 Root TransformがNoneの状態で、まとめたあとににRoot Transformに値がセットされる
+        e1.1.3 対象のオブジェクトを指定して、そこにまとまる
+        e1.1.4 対象のオブジェクトを指定せず、新たにPBというオブジェクトが生成されそこにまとまる
+    e1.2 チェックを外した時に、PBがまとめられない
+
+E2. 「コライダーもまとめる」がまとめられる
+    E2.1 同じパラメータでまとめられる
+        e2.1.1 同じパラメータでまとめられる
+        e2.1.2 Root TransformがNoneの状態で、まとめたあとににRoot Transformに値がセットされる
+        e2.1.3 対象のオブジェクトを指定して、そこにまとまる
+        e2.1.4 対象のオブジェクトを指定せず、新たにPBというオブジェクトが生成されそこにまとまる
+        e2.1.5 新しいオブジェクトのプレフィックスが指定されたものになる
+    e2.2 チェックを外した時に、コライダーがまとめられない
+
+E3. 「無視するオブジェクトの設定」が機能する
+    E3.1 「非アクティブを無視」が機能する
+        e3.1.1 チェック時に、非アクティブオブジェクトのPB,Colliderはまとめられない
+        e3.1.2 チェック外した時に、非アクティブオブジェクトのPB,Colliderはまとめられる
+    E3.2 「EditorOnlyタグが付いたオブジェクトを無視」が機能する
+        e3.2.1 チェック時に、EditorOnlyタグのPB,Colliderはまとめらられない
+        e3.2.2 チェック外した時に、EditorOnlyタグのPB,Colliderはまとめられる
+
+E4. 「Root Transformの変更を許可」が機能する
+    e4.1 チェック時に、Root TransformがNoneのPBがまとめられた後にRoot Transformに元のオブジェクトが設定される
+    e4.2 チェックを外した時に、Root TransformがNoneのPBがまとめられた後にRoot TransformがNoneのままになっている
+
+# PhysBone,PhysBoneColliderとテストにおけるその役割(上記の番号で表記)
+・LegUpLeg
+    ・e1.1.1, e1.1.3, e1.1.4, e1.2, e2.1.1, e2.1.3, e2.1.4, e2.1.5, e2.2
+・LeftLeg
+    ・e1.1.2, e2.1.2
+・RightUpLeg
+    ・e3.1.1, e3.1.2, e4.1, e4.2
+・Spine
+    ・e3.2.1, e3.2.2
+
+# テスト実行時の設定の組み合わせとテストできる項目
+設定項目をアルファベットで表す
+a: 非アクティブオブジェクトを無視
+b: EditorOnlyタグが付いたオブジェクトを無視
+c: Root Transformの変更を許可
+d: PhysicsBoneをまとめる
+e: 対象のオブジェクト
+f: コライダーもまとめる
+g: ルートオブジェクト
+h: プレフィックス
+
+チェックの付いている項目のみアルファベットを記載し、toggle以外のパラメータは内容を記載
+## c, d, e:None, f, g:None, h:PBC
+PBというオブジェクトに、LegUpLeg, LeftLeg, RightUpLeg, SpineのPBが移動
+PBCの下に、PBC_LeftUpLeg, PBC_LeftLeg, PBC_RightUpLeg, PBC_Spineというオブジェクトが作成され、Colliderが移動
+LeftLegのRootはLeftLeg
+
+## a, b, c, d, e:None, f, g:None, h:PBC
+PBというオブジェクトに、LegUpLeg, LeftLegが移動
+PBCの下に、PBC_LeftUpLeg, PBC_LeftLegというオブジェクトが作成され、Colliderが移動
+
+## a, b, d, e:None, f, g:None, h:PBC
+PBというオブジェクトに、LegUpLeg, LeftLegのPBが移動
+PBCの下に、PBC_LeftUpLeg, PBC_LeftLegというオブジェクトが作成され、Colliderが移動
+LeftLegのRootはNone
+
+## a, b, c, d, e:PBTest, f, g:PBCTest, h:PBC
+PBTestというオブジェクトに、LegUpLeg, LeftLegのPBが移動
+PBCTestの下に、PBC_LeftUpLeg, PBC_LeftLegというオブジェクトが作成され、Colliderが移動
+LeftLegのRootはLeftLeg
+
+## a, b, c, d, e:None
+PBというオブジェクトに、LegUpLeg, LeftLegのPBが移動
+
+## a, b, c, d, f, g:None, h:PBC
+PBCTestの下に、PBC_LeftUpLeg, PBC_LeftLegというオブジェクトが作成され、Colliderが移動
+
+## なし
+何も移動しない
+
+■ IsAnimatedChangerのテストについて
+# IsAnimatedChangerのテスト項目
+1. 一括でIsAnimatedをOFFにできる
+
+2. 個別にIsAnimatedをOFFにできる
+
+# PhysBoneとテストにおけるその役割(上記の番号で表記)
+・Hips, LeftUpLeg, RightUpLeg
+    ・1, 2
+    ・leftUpLegのみIsAnimatedがOFF
+
+# テスト実行時の設定の組み合わせとテストできる項目
+
+## 一括でOFFにするを押してすべてのIsAnimatedがOFFになる
+## 個別にOFFにしてOFFになっていることを確認する
+
+■ Moverのテストについて
+# Moverのテスト項目
+1 PBが同じパラメータで移動できる
+
+2. Colliderが同じパラメータで移動できる
+
+・「パスが一致しなければ無視する」が機能する
+    3. チェック時に、パスが一致しないPBが移動されない
+    4. チェックしない時に、パスが一致しない名前が一致するオブジェクトにPBが移動する
+
+・「移動先にRoot Transformが無いなら無視する」が機能する
+    5. チェック時に、Root Transformが無いなら移動しない
+    6. チェックを外した時に、Root Transformが無くても移動し、Root TransformがNoneになる
+    ・「パスが一致しなければ無視する」と併用して機能する
+        7. チェック時に、Root Transformのパスが一致しないなら移動しない
+        8. チェックしない時に、Root Transformのパスが一致しないが名前が一致するオブジェクトがあれば移動する
+
+・「移動先にColliderがないなら無視する」が機能する
+    9. チェック時に、複数ついているColliderのうち1つ無いなら移動しない
+    10. チェックを外した時に、複数ついているColliderのうち1つ無いなら、それを無視して移動する
+    ・「パスが一致しなければ無視する」と併用して機能する
+        11. チェック時に、複数ついているColliderのうち1つのパスが一致しないなら移動しない
+        12. チェックを外した時に、複数ついているColliderのうち1つのパスが一致しないなら、それを無視して移動する
+
+・「移動先にIgnore Transformsがないなら無視する」が機能する
+    13. チェック時に、複数ついているIgnore Transformsのうち1つ無いなら移動しない
+    14. チェックを外した時に、複数ついているIgnore Transformsのうち1つ無いなら、それを無視して移動する
+    ・「パスが一致しなければ無視する」と併用して機能する
+        15. チェック時に、複数ついているIgnore Transformsのうち1つのパスが一致しないなら移動しない
+        16. チェックを外した時に、複数ついているIgnore Transfromsのうち1つのパスが一致しないなら、それを無視して移動する
+
+・「移動後に元のPB(Collider)を削除する」が機能する
+    17. チェック時に、移動したPBとColliderが消えている
+    18. チェックを外した時に、移動したPBとColliderが残っている
+
+# PhysBone,PhysBoneColliderとテストにおけるその役割(上記の番号で表記)
+・Hips(PB)
+    ・1
+・HipsCollider1,HipsCollider2(Collider)
+    ・2
+・HipsDummy(PB)
+    ・3,4
+・LeftUpLeg(PB,Collider)
+    ・5,6
+    ・LeftUpDummyという移動先にないオブジェクトをRootとしている
+・LeftLeg(PB, Collider)
+    ・7,8
+    ・LeftUpDummy2という移動先にパスが違って存在しているオブジェクトをRootとしている
+・RightUpLeg(PB)
+    ・9,10,11,12
+    ・RightUpDummyという移動先にないコライダーを参照している
+    ・RightUpDummy2という移動先にパスが違って存在しているコライダーを参照としている
+・Spine(PB)
+    ・13,14,15,16
+    ・SpineDummyという移動先にないオブジェクトを参照している
+    ・SpineDummy2という移動先にパスが違って存在しているオブジェクトを参照している
+・上記オブジェクト
+    ・17, 18
+
+# テスト実行時のチェックの組み合わせとテストできる項目
+各チェック項目を以下のアルファベットで表す
+a: 移動先にRootTransformが無いなら無視する
+b: 移動先にColliderがないなら無視する
+c: 移動先にIgnore Transformsがないなら無視する
+d: パスが一致しなければ無視する
+e: 移動後に元のPB(Collider)を削除する
+
+## 移動後されるPB、Collider一覧
+
+チェックを付けるもののみアルファベットを表す
+### a, b, c, d
+Hips
+HipsCollider1
+HipsCollider2
+
+### d
+Hips
+HipsCollider1
+HipsCollider2
+LeftUpLeg
+    ・Root TransformがNone
+LeftLeg
+    ・Root TransformがNone
+RightUpLeg
+    ・ColliderはRightLegのみ
+Spine
+    ・RootTransformはChestのみ
+
+### a, b, c
+Hips
+HipsCollider1
+HipsCollider2
+LeftLeg
+    ・Root TransformがLeftUpDummy2になっている
+RightUpDummy2
+
+### チェックなし
+Hips
+HipsCollider1
+HipsCollider2
+LeftUpLeg
+    ・Root TransformがNone
+LeftLeg
+    ・Root TransformがNone
+RightUpLeg
+    ・ColliderはRightLeg,RightUpDummy2のみ
+RightUpDummy2
+Spine
+    ・RootTransformはChest,ChestDummy2のみ

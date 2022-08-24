@@ -31,6 +31,9 @@ Test Runnerで単体テストが実行できる("Assets/Scenes/UnitTest"が単体テスト用のシー
 ### Unitypackageのエクスポート
 MakeUityPackage.ps1を実行すると、カレントディレクトリにUnitypackageが生成される。
 
+## 使用方法
+https://docs.google.com/document/d/11EwowImem-9eus6zEt0yfsoCSD0-phpJnKTc5gxlIR8/edit?usp=sharing
+
 ## Author
 
 yakumo  
